@@ -28,7 +28,4 @@ spec:
           value: ""
         - name: AKS_NAME
           value: ""
-        - name: MIN_NODES
-          value: "2"
-        - name: MAX_NODES
-          value: "100"
+          
