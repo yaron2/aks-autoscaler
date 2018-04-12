@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aks-autoscaler-deployment
+  labels:
+    app: aks-autoscaler
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aks-autoscaler
+  template:
+    metadata:
+      labels:
+        app: aks-autoscaler
+    spec:
+      containers:
+      - name: aks-autoscaler
+        image: yaron2/aks-autoscaler
+        env:
+        - name: APP_ID
+          value: ""
+        - name: PASSWORD
+          value: ""
+        - name: RESOURCE_GROUP
+          value: ""
+        - name: TENANT_ID
+          value: ""
+        - name: AKS_NAME
+          value: ""
+        - name: MIN_NODES
+          value: 1
+        - name: MAX_NODES
+          value: 100
