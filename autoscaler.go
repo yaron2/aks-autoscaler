@@ -26,12 +26,12 @@ type AzureAutoScaler struct {
 }
 
 func NewAzureAutoScaler(executor ScaleCommandExecutor, maxNodes int, minNodes int) *AzureAutoScaler {
-	if maxNodes == 0 {
+	if maxNodes == 0 || minNodes > maxNodes {
 		maxNodes = 100
 	}
 
-	if minNodes == 0 {
-		minNodes = 1
+	if minNodes == 0 || minNodes > maxNodes {
+		minNodes = 2
 	}
 
 	return &AzureAutoScaler{MaxNodes: maxNodes, MinNodes: minNodes, Executor: executor}
@@ -182,13 +182,15 @@ func (a *AzureAutoScaler) getDeploymentStatus(kubeClient *kubernetes.Clientset) 
 
 		if len(allpods.Items) > 0 {
 			for _, node := range allNodes.Items {
+
 				empty := true
 				nodeName := node.Name
 
 				for _, pod := range allpods.Items {
 					podNodeName := pod.Spec.NodeName
+					podNamespace := pod.Namespace
 
-					if podNodeName == nodeName {
+					if podNodeName == nodeName && podNamespace != "kube-system" {
 						empty = false
 					}
 				}
