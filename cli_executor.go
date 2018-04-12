@@ -34,6 +34,8 @@ func NewCliExecutor(appID string, password string, tenantID string, aksName stri
 func (c *CliExecutor) Scale(agents int32) {
 	// TODO: Parse return message and return true or false
 	if c.LoggedIn {
+		fmt.Println("scaling to " + fmt.Sprint(agents) + " nodes")
+
 		cmd := "az"
 		cmdArgs := []string{"aks", "scale", "-g", c.ResourceGroup, "-n", c.AksName, "--node-count", fmt.Sprint(agents)}
 		_, err := exec.Command(cmd, cmdArgs...).Output()
