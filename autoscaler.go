@@ -190,34 +190,36 @@ func (a *AzureAutoScaler) getDeploymentStatus(kubeClient *kubernetes.Clientset) 
 	} else {
 		var emptyNodes int
 
-		if len(allpods.Items) > 0 {
-			for _, node := range allNodes.Items {
+		if nodeCount > a.MinNodes {
+			if len(allpods.Items) > 0 {
+				for _, node := range allNodes.Items {
 
-				empty := true
-				nodeName := node.Name
+					empty := true
+					nodeName := node.Name
 
-				for _, pod := range allpods.Items {
-					podNodeName := pod.Spec.NodeName
-					podNamespace := pod.Namespace
+					for _, pod := range allpods.Items {
+						podNodeName := pod.Spec.NodeName
+						podNamespace := pod.Namespace
 
-					if podNodeName == nodeName && (podNamespace != "kube-system" || !a.IsNamespaceExcluded(podNamespace)) {
-						empty = false
+						if podNodeName == nodeName && podNamespace != "kube-system" && !a.IsNamespaceExcluded(podNamespace) {
+							empty = false
+						}
+					}
+
+					if empty {
+						emptyNodes++
 					}
 				}
-
-				if empty {
-					emptyNodes++
-				}
-			}
-		} else {
-			emptyNodes = nodeCount
-		}
-
-		if emptyNodes > 0 {
-			if nodeCount-emptyNodes <= a.MinNodes {
-				a.ScaleDown(int32(a.MinNodes))
 			} else {
-				a.ScaleDown(int32(nodeCount - emptyNodes))
+				emptyNodes = nodeCount
+			}
+
+			if emptyNodes > 0 {
+				if nodeCount-emptyNodes <= a.MinNodes {
+					a.ScaleDown(int32(a.MinNodes))
+				} else {
+					a.ScaleDown(int32(nodeCount - emptyNodes))
+				}
 			}
 		}
 	}
