@@ -17,6 +17,11 @@ spec:
       containers:
       - name: aks-autoscaler
         image: yaron2/aks-autoscaler
+        resources:
+          limits:
+            cpu: "0.2"
+          requests:
+            cpu: "0.1"
         env:
         - name: APP_ID
           value: ""
