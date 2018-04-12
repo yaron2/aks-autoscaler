@@ -1,4 +1,4 @@
-apiVersion: apps/v1
+apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: aks-autoscaler-deployment
@@ -29,6 +29,6 @@ spec:
         - name: AKS_NAME
           value: ""
         - name: MIN_NODES
-          value: 1
+          value: "2"
         - name: MAX_NODES
-          value: 100
+          value: "100"
