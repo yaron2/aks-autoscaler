@@ -9,6 +9,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 )
 
@@ -41,7 +42,21 @@ func homeDir() string {
 	return os.Getenv("USERPROFILE") // windows
 }
 
-func createKubeClient() *kubernetes.Clientset {
+func createKubeClient(inCluster bool) *kubernetes.Clientset {
+	if inCluster {
+		inClusterConfig, err := rest.InClusterConfig()
+		if err != nil {
+			panic(err)
+		}
+
+		clientset, err := kubernetes.NewForConfig(inClusterConfig)
+		if err != nil {
+			panic(err)
+		}
+
+		return clientset
+	}
+
 	var kubeconfig *string
 	if home := homeDir(); home != "" {
 		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
@@ -56,7 +71,6 @@ func createKubeClient() *kubernetes.Clientset {
 		panic(err.Error())
 	}
 
-	// create the clientset
 	clientset, err := kubernetes.NewForConfig(config)
 
 	if err != nil {
@@ -69,7 +83,7 @@ func createKubeClient() *kubernetes.Clientset {
 func (a AzureAutoScaler) Start() {
 	a.Executor.Login()
 
-	kubeClient := createKubeClient()
+	kubeClient := createKubeClient(true)
 	a.watchDeploymentsStatus(kubeClient)
 }
 
