@@ -128,6 +128,16 @@ func (a *AzureAutoScaler) GetRelevantNamespaces(kubeClient *kubernetes.Clientset
 	return filtered
 }
 
+func (a *AzureAutoScaler) IsNamespaceExcluded(namespace string) bool {
+	for i := range a.ExcludedNamespaces {
+		if a.ExcludedNamespaces[i] == namespace {
+			return true
+		}
+	}
+
+	return false
+}
+
 func (a *AzureAutoScaler) getDeploymentStatus(kubeClient *kubernetes.Clientset) {
 	namespaces := a.GetRelevantNamespaces(kubeClient)
 
@@ -190,7 +200,7 @@ func (a *AzureAutoScaler) getDeploymentStatus(kubeClient *kubernetes.Clientset) 
 					podNodeName := pod.Spec.NodeName
 					podNamespace := pod.Namespace
 
-					if podNodeName == nodeName && podNamespace != "kube-system" {
+					if podNodeName == nodeName && (podNamespace != "kube-system" || !a.IsNamespaceExcluded(podNamespace)) {
 						empty = false
 					}
 				}
