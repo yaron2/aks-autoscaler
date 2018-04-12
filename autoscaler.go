@@ -28,7 +28,7 @@ func NewAzureAutoScaler(executor ScaleCommandExecutor, maxNodes int, minNodes in
 	}
 
 	if minNodes == 0 {
-		minNodes = 2
+		minNodes = 1
 	}
 
 	return &AzureAutoScaler{MaxNodes: maxNodes, MinNodes: minNodes, Executor: executor}
