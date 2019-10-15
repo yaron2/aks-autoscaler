@@ -1,5 +1,7 @@
 # AKS Autoscaler
 
+[![Go Report Card](https://goreportcard.com/badge/github.com/yaron2/aks-autoscaler)](https://goreportcard.com/report/github.com/yaron2/aks-autoscaler)
+
 A node autoscaler for AKS (Azure Container Service)
 
 ## About
